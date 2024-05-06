@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhrj.exam.mapper.ZhrjAlarmInfoMapper">
+
+    <select id="selectAllDeptEvents" resultType="com.zhrj.exam.dto.DeptEvent">
+        select A.dept_name,count(1) counts,A.dept_id from zhrj_dept A,zhrj_alarm_info B
+        where A.dept_id = B.dept_id group by A.dept_id
+    </select>
+
+
+    <select id="selectAllTypeEvents" resultType="com.zhrj.exam.dto.TypeEvent">
+        select event_type,count(1) counts from zhrj_alarm_info
+        group by event_type
+    </select>
+
+
+    <select id="selectAllEventsByDate" resultType="com.zhrj.exam.dto.DateEvent" parameterType="string">
+        select DATE_FORMAT(event_time, '%Y-%m-%d') as eventDate, COUNT(*) as counts
+        from zhrj_alarm_info
+        where DATE_FORMAT(event_time, '%Y-%m') = #{date}
+        group by eventDate;
+    </select>
+
+    <select id="selectAllZhrjAlarmInfos" resultType="com.zhrj.exam.dto.ExcelZhrjAlarmInfoDTO">
+        select ifnull(B.dept_name,A.dept_id) as deptName,A.wan_ip,A.event_time,A.event_type,A.event_status,A.event_reasons
+        from zhrj_alarm_info A
+            left join zhrj_dept B on A.dept_id = B.dept_id
+    </select>
+
+    <select id="selectZhrjAlarmInfosPageByType" resultType="com.zhrj.exam.dto.ExcelZhrjAlarmInfoDTO" parameterType="int">
+        select ifnull(B.dept_name,A.dept_id) as deptName,A.wan_ip,A.event_time,A.event_type,A.event_status,A.event_reasons
+        from zhrj_alarm_info A
+                 left join zhrj_dept B on A.dept_id = B.dept_id
+        where A.event_type = #{type}
+        limit #{end} offset #{start}
+    </select>
+
+
+</mapper>
